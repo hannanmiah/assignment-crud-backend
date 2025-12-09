@@ -29,7 +29,7 @@ These instructions will get you a copy of the project up and running on your loc
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/hannanmiah/assignment-crud-backend.git
-   cd assignment-backend
+   cd assignment-crud-backend
    ```
 
 2. **Install dependencies:**
