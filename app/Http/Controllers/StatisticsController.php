@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 class StatisticsController extends Controller
 {
-    public function overview(): \Illuminate\Http\JsonResponse
+    public function overview(): JsonResponse
     {
         $stats = [
             'total_products' => Product::count(),
@@ -24,7 +25,7 @@ class StatisticsController extends Controller
         ]);
     }
 
-    public function products(): \Illuminate\Http\JsonResponse
+    public function products(): JsonResponse
     {
         $stats = [
             'total_products' => Product::count(),
@@ -44,7 +45,7 @@ class StatisticsController extends Controller
         ]);
     }
 
-    public function stock(): \Illuminate\Http\JsonResponse
+    public function stock(): JsonResponse
     {
         $criticalProducts = Product::where('stock', '<=', 10)
             ->select('id', 'name', 'stock', 'price')
@@ -76,7 +77,7 @@ class StatisticsController extends Controller
         ]);
     }
 
-    public function pricing(): \Illuminate\Http\JsonResponse
+    public function pricing(): JsonResponse
     {
         $count = Product::count();
 

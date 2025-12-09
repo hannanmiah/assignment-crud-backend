@@ -6,17 +6,26 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $products = Product::query()
+            ->when($request->has('search'), function ($query) use ($request) {
+                $query->whereAny(['name', 'description'], 'like', '%' . $request->search . '%');
+            })
             ->when($request->has('is_active'), function ($query) use ($request) {
                 $query->where('is_active', $request->boolean('is_active'));
             })
-            ->paginate(10);
+            ->when($request->has('sort'), function ($query) use ($request) {
+                // get sort separated by like column:order
+                [$column, $order] = explode(':', $request->sort);
+                $query->orderBy($column, $order);
+            })
+            ->paginate($request->query('per_page', 10));
 
         return response()->json([
             'data' => ProductResource::collection($products->items()),
@@ -29,7 +38,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(StoreProductRequest $request): \Illuminate\Http\JsonResponse
+    public function store(StoreProductRequest $request): JsonResponse
     {
         $product = Product::create($request->validated());
 
@@ -39,14 +48,14 @@ class ProductController extends Controller
         ], 201);
     }
 
-    public function show(Product $product): \Illuminate\Http\JsonResponse
+    public function show(Product $product): JsonResponse
     {
         return response()->json([
             'data' => new ProductResource($product),
         ]);
     }
 
-    public function update(UpdateProductRequest $request, Product $product): \Illuminate\Http\JsonResponse
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
         $product->update($request->validated());
 
@@ -56,7 +65,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function destroy(Product $product): \Illuminate\Http\JsonResponse
+    public function destroy(Product $product): JsonResponse
     {
         $product->delete();
 
