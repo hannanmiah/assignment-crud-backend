@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,3 +17,10 @@ Route::prefix('auth')->name('auth.')->controller(AuthenticationController::class
 });
 
 Route::apiResource('products', ProductController::class)->middleware('auth:sanctum');
+
+Route::prefix('statistics')->middleware('auth:sanctum')->name('statistics.')->controller(StatisticsController::class)->group(function () {
+    Route::get('overview', 'overview')->name('overview');
+    Route::get('products', 'products')->name('products');
+    Route::get('stock', 'stock')->name('stock');
+    Route::get('pricing', 'pricing')->name('pricing');
+});

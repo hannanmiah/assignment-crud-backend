@@ -236,6 +236,113 @@ All endpoints may return error responses with appropriate HTTP status codes:
 
 ---
 
+## Statistics
+
+### 1. Overview Statistics
+
+-   **Endpoint:** `GET /api/statistics/overview`
+-   **Description:** Retrieves high-level statistics about the application.
+-   **Authentication:** Required
+-   **Response Schema:**
+
+```json
+{
+    "data": {
+        "total_products": 10,
+        "active_products": 8,
+        "inactive_products": 2,
+        "total_users": 5,
+        "total_stock_value": 15000.00,
+        "out_of_stock_products": 2,
+        "low_stock_products": 3
+    }
+}
+```
+
+### 2. Products Statistics
+
+-   **Endpoint:** `GET /api/statistics/products`
+-   **Description:** Retrieves detailed statistics about products.
+-   **Authentication:** Required
+-   **Response Schema:**
+
+```json
+{
+    "data": {
+        "total_products": 10,
+        "active_products": 8,
+        "inactive_products": 2,
+        "average_price": 299.99,
+        "highest_price": 999.99,
+        "lowest_price": 49.99,
+        "total_stock": 500,
+        "out_of_stock_products": 2,
+        "low_stock_products": 3,
+        "total_stock_value": 15000.00
+    }
+}
+```
+
+### 3. Stock Statistics
+
+-   **Endpoint:** `GET /api/statistics/stock`
+-   **Description:** Retrieves inventory and stock-related statistics.
+-   **Authentication:** Required
+-   **Response Schema:**
+
+```json
+{
+    "data": {
+        "total_products": 10,
+        "out_of_stock_products": 2,
+        "low_stock_products": 3,
+        "adequate_stock_products": 5,
+        "total_stock": 500,
+        "total_stock_value": 15000.00,
+        "critical_products": [
+            {
+                "id": 1,
+                "name": "Product Name",
+                "current_stock": 0,
+                "price": 299.99,
+                "stock_value": 0.00,
+                "status": "out_of_stock"
+            }
+        ]
+    }
+}
+```
+
+### 4. Pricing Statistics
+
+-   **Endpoint:** `GET /api/statistics/pricing`
+-   **Description:** Retrieves pricing-related statistics and distribution.
+-   **Authentication:** Required
+-   **Response Schema:**
+
+```json
+{
+    "data": {
+        "total_products": 10,
+        "average_price": 299.99,
+        "median_price": 250.00,
+        "highest_price": 999.99,
+        "lowest_price": 49.99,
+        "price_range": 950.00,
+        "total_inventory_value": 15000.00,
+        "price_distribution": {
+            "under_50": 1,
+            "50_to_100": 2,
+            "100_to_250": 3,
+            "250_to_500": 3,
+            "over_500": 1
+        }
+    }
+}
+```
+
+---
+
 ## Base URL
 
 The base URL for all API endpoints is: `http://localhost:8000/api`
