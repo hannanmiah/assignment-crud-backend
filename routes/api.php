@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,5 @@ Route::prefix('auth')->name('auth.')->controller(AuthenticationController::class
     Route::post('login', 'login')->name('login');
     Route::post('logout', 'logout')->middleware('auth:sanctum')->name('logout');
 });
+
+Route::apiResource('products', ProductController::class)->middleware('auth:sanctum');
