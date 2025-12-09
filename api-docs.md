@@ -8,17 +8,68 @@ All API endpoints require token-based authentication using Laravel Sanctum. To a
 
 `Authorization: Bearer <your-token>`
 
-You can generate a token using the `php artisan auth:create-token` command.
+### Authentication Endpoints
+
+#### Register User
+-   **Endpoint:** `POST /api/auth/register`
+-   **Description:** Creates a new user account and returns an API token.
+-   **Request Parameters:**
+
+| Parameter | Type   | Description                      |
+| --------- | ------ | -------------------------------- |
+| `name`    | string | The user's full name.            |
+| `email`   | string | The user's email address.        |
+| `password` | string | The user's password (min 8 chars). |
+| `password_confirmation` | string | Must match password. |
+
+-   **Response Schema:**
+
+```json
+{
+    "token": "1|abc123def456..."
+}
+```
+
+#### Login User
+-   **Endpoint:** `POST /api/auth/login`
+-   **Description:** Authenticates a user and returns an API token.
+-   **Request Parameters:**
+
+| Parameter | Type   | Description                  |
+| --------- | ------ | ---------------------------- |
+| `email`   | string | The user's email address.    |
+| `password` | string | The user's password.         |
+
+-   **Response Schema:**
+
+```json
+{
+    "token": "1|abc123def456..."
+}
+```
+
+#### Logout User
+-   **Endpoint:** `POST /api/auth/logout`
+-   **Description:** Logs out the user and invalidates their API token.
+-   **Authentication:** Required
+-   **Response:** `204 No Content`
 
 ---
 
-## Students
+## Products
 
-### 1. Get all students
+### 1. Get all products
 
--   **Endpoint:** `GET /api/students`
--   **Description:** Retrieves a list of all students.
--   **Request Parameters:** None
+-   **Endpoint:** `GET /api/products`
+-   **Description:** Retrieves a paginated list of products with optional filtering.
+-   **Authentication:** Required
+-   **Query Parameters:**
+
+| Parameter   | Type    | Description                              |
+| ----------- | ------- | ---------------------------------------- |
+| `is_active` | boolean | Filter by active status (0 or 1). Optional. |
+| `page`      | integer | Page number for pagination. Defaults to 1. |
+
 -   **Response Schema:**
 
 ```json
@@ -26,193 +77,169 @@ You can generate a token using the `php artisan auth:create-token` command.
     "data": [
         {
             "id": 1,
-            "name": "John Doe",
-            "student_id": "12345",
-            "class": "10",
-            "section": "A",
-            "photo": "https://via.placeholder.com/150",
-            "created_at": "2025-11-15T12:00:00.000000Z",
-            "updated_at": "2025-11-15T12:00:00.000000Z"
+            "name": "Premium Wireless Headphones",
+            "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life.",
+            "price": 299.99,
+            "stock": 50,
+            "is_active": true,
+            "created_at": "2025-12-09T17:03:34.000000Z",
+            "updated_at": "2025-12-09T17:03:34.000000Z"
         }
-    ]
+    ],
+    "pagination": {
+        "current_page": 1,
+        "last_page": 2,
+        "per_page": 10,
+        "total": 15
+    }
 }
 ```
 
-### 2. Create a new student
+### 2. Create a new product
 
--   **Endpoint:** `POST /api/students`
--   **Description:** Creates a new student.
+-   **Endpoint:** `POST /api/products`
+-   **Description:** Creates a new product.
+-   **Authentication:** Required
 -   **Request Parameters:**
 
-| Parameter    | Type   | Description              |
-| ------------ | ------ | ------------------------ |
-| `name`       | string | The name of the student. |
-| `student_id` | string | The ID of the student.   |
-| `class`      | string | The class of the student.  |
-| `section`    | string | The section of the student.|
-| `photo`      | string | (Optional) A URL to the student's photo. |
+| Parameter    | Type    | Description                              |
+| ------------ | ------- | ---------------------------------------- |
+| `name`       | string  | The product name (required, max 255 chars). |
+| `description`| string  | The product description (required).     |
+| `price`      | numeric | The product price (required, min 0, max 999999.99). |
+| `stock`      | integer | The product stock quantity (required, min 0). |
+| `is_active`  | boolean | Whether the product is active (optional, defaults to true). |
 
+-   **Response Schema:**
+
+```json
+{
+    "message": "Product created successfully",
+    "data": {
+        "id": 1,
+        "name": "Premium Wireless Headphones",
+        "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life.",
+        "price": 299.99,
+        "stock": 50,
+        "is_active": true,
+        "created_at": "2025-12-09T17:03:34.000000Z",
+        "updated_at": "2025-12-09T17:03:34.000000Z"
+    }
+}
+```
+
+### 3. Get a single product
+
+-   **Endpoint:** `GET /api/products/{id}`
+-   **Description:** Retrieves a single product by its ID.
+-   **Authentication:** Required
 -   **Response Schema:**
 
 ```json
 {
     "data": {
         "id": 1,
-        "name": "John Doe",
-        "student_id": "12345",
-        "class": "10",
-        "section": "A",
-        "photo": "https://via.placeholder.com/150",
-        "created_at": "2025-11-15T12:00:00.000000Z",
-        "updated_at": "2025-11-15T12:00:00.000000Z"
+        "name": "Premium Wireless Headphones",
+        "description": "High-quality wireless headphones with noise cancellation and 20-hour battery life.",
+        "price": 299.99,
+        "stock": 50,
+        "is_active": true,
+        "created_at": "2025-12-09T17:03:34.000000Z",
+        "updated_at": "2025-12-09T17:03:34.000000Z"
     }
 }
 ```
 
-### 3. Get a single student
+### 4. Update a product
 
--   **Endpoint:** `GET /api/students/{id}`
--   **Description:** Retrieves a single student by their ID.
--   **Request Parameters:** None
--   **Response Schema:**
-
-```json
-{
-    "data": {
-        "id": 1,
-        "name": "John Doe",
-        "student_id": "12345",
-        "class": "10",
-        "section": "A",
-        "photo": "https://via.placeholder.com/150",
-        "created_at": "2025-11-15T12:00:00.000000Z",
-        "updated_at": "2025-11-15T12:00:00.000000Z"
-    }
-}
-```
-
-### 4. Update a student
-
--   **Endpoint:** `PUT /api/students/{id}`
--   **Description:** Updates a student's information.
+-   **Endpoint:** `PUT /api/products/{id}`
+-   **Description:** Updates a product's information.
+-   **Authentication:** Required
 -   **Request Parameters:**
 
-| Parameter    | Type   | Description              |
-| ------------ | ------ | ------------------------ |
-| `name`       | string | The name of the student. |
-| `student_id` | string | The ID of the student.   |
-| `class`      | string | The class of the student.  |
-| `section`    | string | The section of the student.|
-| `photo`      | string | (Optional) A URL to the student's photo. |
+| Parameter    | Type    | Description                              |
+| ------------ | ------- | ---------------------------------------- |
+| `name`       | string  | The product name (optional, max 255 chars). |
+| `description`| string  | The product description (optional).     |
+| `price`      | numeric | The product price (optional, min 0, max 999999.99). |
+| `stock`      | integer | The product stock quantity (optional, min 0). |
+| `is_active`  | boolean | Whether the product is active (optional). |
 
 -   **Response Schema:**
 
 ```json
 {
+    "message": "Product updated successfully",
     "data": {
         "id": 1,
-        "name": "John Doe",
-        "student_id": "12345",
-        "class": "10",
-        "section": "A",
-        "photo": "https://via.placeholder.com/150",
-        "created_at": "2025-11-15T12:00:00.000000Z",
-        "updated_at": "2025-11-15T12:00:00.000000Z"
+        "name": "Updated Product Name",
+        "description": "Updated product description",
+        "price": 199.99,
+        "stock": 25,
+        "is_active": false,
+        "created_at": "2025-12-09T17:03:34.000000Z",
+        "updated_at": "2025-12-09T17:15:42.000000Z"
     }
 }
 ```
 
-### 5. Delete a student
+### 5. Delete a product
 
--   **Endpoint:** `DELETE /api/students/{id}`
--   **Description:** Deletes a student.
--   **Request Parameters:** None
--   **Response:** `204 No Content`
+-   **Endpoint:** `DELETE /api/products/{id}`
+-   **Description:** Deletes a product permanently.
+-   **Authentication:** Required
+-   **Response Schema:**
+
+```json
+{
+    "message": "Product deleted successfully"
+}
+```
 
 ---
 
-## Attendance
+## Error Responses
 
-### 1. Record attendance in bulk
+All endpoints may return error responses with appropriate HTTP status codes:
 
--   **Endpoint:** `POST /api/attendance`
--   **Description:** Records attendance for multiple students at once.
--   **Request Body:** An array of attendance objects.
-
-```json
-[
-    {
-        "student_id": 1,
-        "date": "2025-11-15",
-        "status": "present",
-        "note": "Optional note"
-    },
-    {
-        "student_id": 2,
-        "date": "2025-11-15",
-        "status": "absent",
-        "note": "Optional note"
-    }
-]
-```
-
--   **Response:**
-
+### 401 Unauthorized
 ```json
 {
-    "message": "Attendance recorded successfully."
+    "message": "Unauthenticated."
 }
 ```
 
-### 2. Get monthly attendance report
-
--   **Endpoint:** `GET /api/attendance/report`
--   **Description:** Retrieves a monthly attendance report for a specific class.
--   **Request Parameters:**
-
-| Parameter | Type    | Description              |
-| --------- | ------- | ------------------------ |
-| `month`   | integer | The month of the report (1-12). |
-| `class`   | string  | The class to generate the report for. |
-
--   **Response Schema:**
-
-```json
-[
-    {
-        "id": 1,
-        "student_id": 1,
-        "date": "2025-11-15",
-        "status": "present",
-        "note": null,
-        "recorded_by": 1,
-        "created_at": "2025-11-15T12:00:00.000000Z",
-        "updated_at": "2025-11-15T12:00:00.000000Z",
-        "student": {
-            "id": 1,
-            "name": "John Doe",
-            "student_id": "12345",
-            "class": "10",
-            "section": "A",
-            "photo": "https://via.placeholder.com/150",
-            "created_at": "2025-11-15T12:00:00.000000Z",
-            "updated_at": "2025-11-15T12:00:00.000000Z"
-        }
-    }
-]
-```
-
-### 3. Get attendance statistics
-
--   **Endpoint:** `GET /api/attendance/statistics`
--   **Description:** Retrieves attendance statistics.
--   **Request Parameters:** None
--   **Response Schema:**
-
+### 404 Not Found
 ```json
 {
-    "present": 100,
-    "absent": 10,
-    "late": 5
+    "message": "No query results for model [App\\Models\\Product]"
 }
 ```
+
+### 422 Unprocessable Entity
+```json
+{
+    "message": "The name field is required. (and 2 more errors)",
+    "errors": {
+        "name": [
+            "The name field is required."
+        ],
+        "price": [
+            "The price field must be at least 0."
+        ],
+        "stock": [
+            "The stock field must be at least 0."
+        ]
+    }
+}
+```
+
+---
+
+## Base URL
+
+The base URL for all API endpoints is: `http://localhost:8000/api`
+
+## Rate Limiting
+
+API endpoints may be subject to rate limiting. Check response headers for rate limit information.

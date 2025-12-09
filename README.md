@@ -1,16 +1,18 @@
 
-# Attendance Management System
+# Product Management API
 
-This is a Laravel-based attendance management system that provides a robust API for managing students, recording attendance, and generating insightful reports and statistics. It's designed to be a backend powerhouse for any modern attendance tracking application.
+A robust Laravel-based REST API for managing products with full CRUD operations, authentication, and comprehensive testing. This application serves as a complete backend solution for product inventory management, featuring secure API endpoints built with Laravel 12 and Sanctum authentication.
 
 ## Features
 
-- **Student Management:** CRUD operations for students.
-- **Attendance Tracking:** Record daily attendance (present, absent, late).
-- **Reporting:** Generate monthly attendance reports.
-- **Statistics:** Get attendance statistics and trends.
-- **Authentication:** Secure API endpoints with Laravel Sanctum.
-- **Scalable:** Built on the latest Laravel 12 for a modern, scalable, and maintainable codebase.
+- **Product Management:** Complete CRUD operations for products (Create, Read, Update, Delete)
+- **Authentication:** Secure API endpoints with Laravel Sanctum token-based authentication
+- **Validation:** Comprehensive input validation with custom error responses
+- **Pagination:** Efficient product listing with pagination support
+- **Filtering:** Filter products by active status and other criteria
+- **Testing:** Full test coverage with Pest testing framework
+- **API Documentation:** Detailed API documentation with examples
+- **Clean Architecture:** Organized code structure following Laravel best practices
 
 ## Getting Started
 
@@ -18,7 +20,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-- PHP >= 8.2
+- PHP >= 8.4
 - Composer
 - A database server (SQLite, MySQL, PostgreSQL, etc.)
 
@@ -26,8 +28,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/hannanmiah/attendance-management-backend.git
-   cd attendance-management-backend
+   git clone https://github.com/hannanmiah/assignment-backend.git
+   cd assignment-backend
    ```
 
 2. **Install dependencies:**
@@ -68,132 +70,111 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## API Documentation
 
-All endpoints are prefixed with `/api`.
+All endpoints are prefixed with `/api` and require authentication using Laravel Sanctum. You must include an `Authorization: Bearer <token>` header in all requests (except register and login).
 
 ### Authentication
 
-- **`POST /auth/register`**: Register a new user.
-  - **Parameters:**
-    - `name` (string, required)
-    - `email` (string, required, unique)
-    - `password` (string, required, min:8, confirmed)
+- **`POST /auth/register`**: Register a new user and receive an API token.
+  - **Parameters:** `name`, `email`, `password`, `password_confirmation`
   - **Response:** `201 Created` with a Sanctum token.
 
-- **`POST /auth/login`**: Log in a user.
-  - **Parameters:**
-    - `email` (string, required, email)
-    - `password` (string, required, min:8)
+- **`POST /auth/login`**: Authenticate and receive an API token.
+  - **Parameters:** `email`, `password`
   - **Response:** `200 OK` with a Sanctum token.
 
-- **`POST /auth/logout`**: Log out the authenticated user.
+- **`POST /auth/logout`**: Logout and invalidate the API token.
   - **Authentication:** Required.
   - **Response:** `204 No Content`.
 
-### Students
+### Products
 
-- **`GET /students`**: Get a paginated list of students.
+- **`GET /products`**: Get a paginated list of products.
   - **Authentication:** Required.
-  - **Query Parameters:**
-    - `per_page` (integer, optional): Number of students per page.
-    - `search` (string, optional): Search by name, class, or section.
-    - `class` (string, optional): Filter by class.
-    - `student_id` (string, optional): Filter by student ID.
-  - **Response:** `200 OK` with a paginated list of students.
+  - **Query Parameters:** `is_active` (boolean filter), `page` (pagination)
+  - **Response:** `200 OK` with paginated product data and pagination metadata.
 
-- **`POST /students`**: Create a new student.
+- **`POST /products`**: Create a new product.
   - **Authentication:** Required.
-  - **Parameters:**
-    - `name` (string, required, max:255)
-    - `student_id` (string, required, max:255, unique)
-    - `class` (string, required, max:255)
-    - `section` (string, required, max:255)
-    - `photo` (string, nullable, max:255)
-  - **Response:** `201 Created` with the new student data.
+  - **Parameters:** `name`, `description`, `price`, `stock`, `is_active` (optional)
+  - **Response:** `201 Created` with the new product data.
 
-- **`GET /students/{student}`**: Get a specific student.
+- **`GET /products/{id}`**: Get a specific product.
   - **Authentication:** Required.
-  - **Response:** `200 OK` with the student data.
+  - **Response:** `200 OK` with the product data.
 
-- **`PUT/PATCH /students/{student}`**: Update a student.
+- **`PUT /products/{id}`**: Update a product.
   - **Authentication:** Required.
-  - **Parameters:** Same as `POST /students`.
-  - **Response:** `200 OK` with the updated student data.
+  - **Parameters:** All fields are optional: `name`, `description`, `price`, `stock`, `is_active`
+  - **Response:** `200 OK` with the updated product data.
 
-- **`DELETE /students/{student}`**: Delete a student.
+- **`DELETE /products/{id}`**: Delete a product.
   - **Authentication:** Required.
-  - **Response:** `204 No Content`.
+  - **Response:** `200 OK` with success message.
 
-### Attendance
+### Detailed Documentation
 
-- **`GET /attendances`**: Get a paginated list of attendance records.
-  - **Authentication:** Required.
-  - **Query Parameters:**
-    - `per_page` (integer, optional): Number of records per page.
-  - **Response:** `200 OK` with a paginated list of attendance records.
-
-- **`POST /attendance`**: Record attendance for one or more students.
-  - **Authentication:** Required.
-  - **Parameters:** An array of attendance objects:
-    ```json
-    [
-      {
-        "student_id": 1,
-        "date": "2025-11-16",
-        "status": "present",
-        "note": "Arrived on time."
-      },
-      {
-        "student_id": 2,
-        "date": "2025-11-16",
-        "status": "absent",
-        "note": "Sick leave."
-      }
-    ]
-    ```
-  - **Response:** `200 OK` with a success message.
-
-- **`GET /attendance/report`**: Get a monthly attendance report.
-  - **Authentication:** Required.
-  - **Query Parameters:**
-    - `month` (integer, required, between:1,12)
-    - `class` (string, required)
-  - **Response:** `200 OK` with the monthly report data.
-
-- **`GET /attendance/statistics`**: Get attendance statistics.
-  - **Authentication:** Required.
-  - **Response:** `200 OK` with attendance statistics.
-
-### Statistics
-
-- **`GET /stats/attendance-this-month`**: Get daily attendance trend for the current month.
-  - **Authentication:** Required.
-  - **Response:** `200 OK` with the trend data.
-
-- **`GET /stats/attendance-this-year`**: Get monthly attendance trend for the current year.
-  - **Authentication:** Required.
-  - **Response:** `200 OK` with the trend data.
-
-### More api docs
-- [API Docs](api-docs.md)
+For comprehensive API documentation including detailed request/response examples, error handling, and authentication guides, see: **[API Documentation](api-docs.md)**
 
 ## Testing
 
-To run the test suite, use the following command:
+The application includes comprehensive test coverage using Pest. To run the test suite:
 
 ```bash
+# Run all tests
 php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/ProductTest.php
+
+# Run tests with coverage
+php artisan test --coverage
+```
+
+Test coverage includes:
+- Authentication flows (register, login, logout)
+- Product CRUD operations (Create, Read, Update, Delete)
+- Input validation and error handling
+- Authorization and security
+- Edge cases and error scenarios
+
+## Project Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── AuthenticationController.php
+│   │   └── ProductController.php
+│   ├── Requests/
+│   │   ├── StoreProductRequest.php
+│   │   └── UpdateProductRequest.php
+│   └── Resources/
+│       └── ProductResource.php
+├── Models/
+│   ├── User.php
+│   └── Product.php
+database/
+├── factories/
+│   ├── ProductFactory.php
+│   └── UserFactory.php
+├── migrations/
+└── seeders/
+tests/
+├── Feature/
+│   └── ProductTest.php
 ```
 
 ## Built With
 
-- [Laravel](https://laravel.com/) - The PHP framework for web artisans.
-- [Laravel Sanctum](https://laravel.com/docs/sanctum) - For API authentication.
-- [Laravel Trend](https://github.com/flowframe/laravel-trend) - For generating trends.
-- [Pest](https://pestphp.com/) - The elegant PHP testing framework.
+- **[Laravel 12](https://laravel.com/)** - Modern PHP framework with streamlined architecture
+- **[Laravel Sanctum](https://laravel.com/docs/sanctum)** - Secure API authentication with tokens
+- **[Pest 4](https://pestphp.com/)** - Elegant and developer-friendly testing framework
+- **[Laravel Pint](https://laravel.com/docs/pint)** - Code formatter for maintaining code style
+- **[SQLite](https://www.sqlite.org/)** - Lightweight database for development and testing
 
 ## Contributing
 
-Thank you for considering contributing to the Attendance Management System! Please feel free to create a pull request.
+Thank you for considering contributing to the Product Management API! Please feel free to create a pull request or open an issue for any improvements or bug reports.
 
 ## License
 
